@@ -104,19 +104,19 @@ def count_two_piece(board, piece):
     count = 0
     for c in range(COLUMNS - 3):
         for r in range(ROWS):
-            if board[r][c] == piece and board[r][c + 1] == piece:
+            if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == 0:
                 count +=1
     for c in range(COLUMNS):
         for r in range(ROWS - 3):
-            if board[r][c] == piece and board[r + 1][c] == piece:
+            if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == 0:
                count +=1
     for c in range(COLUMNS - 3):
         for r in range(ROWS - 3):
-            if board[r][c] == piece and board[r + 1][c + 1] == piece:
+            if board[r][c] == piece and board[r + 1][c + 1] == piece and board[r + 2][c + 2] == 0:
                 count +=1
     for c in range(COLUMNS - 3):
         for r in range(3, ROWS):
-            if board[r][c] == piece and board[r - 1][c + 1] == piece:
+            if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == 0:
                 count +=1
 
     return count
@@ -126,19 +126,19 @@ def count_three_piece(board, piece):
     count = 0
     for c in range(COLUMNS - 3):
         for r in range(ROWS):
-            if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == piece:
+            if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == piece and board[r][c + 3] == 0:
                 count +=1
     for c in range(COLUMNS):
         for r in range(ROWS - 3):
-            if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == piece:
+            if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == piece and board[r + 3][c] == 0:
                 count +=1
     for c in range(COLUMNS - 3):
         for r in range(ROWS - 3):
-            if board[r][c] == piece and board[r + 1][c + 1] == piece and board[r + 2][c + 2] == piece:
+            if board[r][c] == piece and board[r + 1][c + 1] == piece and board[r + 2][c + 2] == piece and board[r + 3][c + 3] == 0:
                 count +=1
     for c in range(COLUMNS - 3):
         for r in range(3, ROWS):
-            if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == piece:
+            if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == piece and board[r - 3][c + 3] == 0:
                 count +=1
     return count
 
