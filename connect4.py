@@ -1,8 +1,8 @@
 import numpy as np
 from os import system, name
 
-ROWS = 9
-COLUMNS = 9
+ROWS = 6
+COLUMNS = 7
 
 # ----------------------------------------------------------------------------------
 def clear():
@@ -168,10 +168,8 @@ def create_weights_board():
 
 # ----------------------------------------------------------------------------------
 def imprimir_matriz(matriz):
-    for linha in matriz:
-        for elemento in linha:
-            print(elemento, end=' ')
-        print()
+    mat90 = np.rot90(matriz, k = 1, axes = (0, 1))
+    print(np.rot90(mat90, k = 1, axes = (0, 1)))
 # ----------------------------------------------------------------------------------
 # CSI457 e CSI701
 # Programa Principal
@@ -202,7 +200,7 @@ while not game_over:
                 print("Jogador 2 Vence!!!")
                 game_over = True
 
-    print(board)
+    imprimir_matriz(board)
     print(" ")
     print("Heuristica: ", heuristic_calculation(board))
     print(" ")
