@@ -168,8 +168,19 @@ def create_weights_board():
 
 # ----------------------------------------------------------------------------------
 def imprimir_matriz(matriz):
-    mat90 = np.rot90(matriz, k = 1, axes = (0, 1))
-    print(np.rot90(mat90, k = 1, axes = (0, 1)))
+    mat90= np.rot90(matriz, k = 1, axes = (0, 1))
+    mat180= np.rot90(mat90, k = 1, axes = (0, 1))
+
+    for l in mat180:
+        for element in l:
+            if element == 0:
+                print("_", end=' ')
+            else:
+                if element == 1: 
+                    print("X", end=' ')
+                else:
+                    print("O", end=' ')
+        print()
 # ----------------------------------------------------------------------------------
 # CSI457 e CSI701
 # Programa Principal
@@ -184,7 +195,7 @@ clear()
 while not game_over:
     # Movimento do Jogador 1
     if turn == 0:
-        col = int(input("Jogador 1, selecione a coluna (0-6):"))
+        col = int(input("Jogador 1, selecione a coluna ({}-0):".format(COLUMNS-1)))
         if valid_location(board, col):
             drop_piece(board, col, 1)
             if is_winning_move(board, 1):
