@@ -1,8 +1,8 @@
 import numpy as np
 from os import system, name
 
-ROWS = 6
-COLUMNS = 7
+ROWS = 9
+COLUMNS = 9
 
 # ----------------------------------------------------------------------------------
 def clear():
@@ -142,15 +142,43 @@ def count_three_piece(board, piece):
                 count +=1
     return count
 
-def heuristic_calculation(board):
-    return (count_two_piece(board,1) + 2 * count_three_piece(board,1)) - (count_two_piece(board,2) + 2 * count_three_piece(board,2))
+# ----------------------------------------------------------------------------------
+def count_weight(board, piece):
+    count = 0
+    for c in range(COLUMNS):
+        for r in range(ROWS):
+            if board[r][c] == piece:
+                count += weights_board[r][c]
+    return count
 
+# ----------------------------------------------------------------------------------
+def heuristic_calculation(board):
+    return (count_weight(board ,1) + count_two_piece(board,1) + 2 * count_three_piece(board,1) ) - ( count_weight(board, 2) + count_two_piece(board,2) + 2 * count_three_piece(board,2))
+
+# ----------------------------------------------------------------------------------
+def create_weights_board():
+    matriz = [[0] * COLUMNS for _ in range(ROWS)]
+    
+    for i in range(ROWS):
+        for j in range(COLUMNS):
+            valor = min(i, j, ROWS - i - 1, COLUMNS - j - 1) + 1
+            matriz[i][j] = valor
+    
+    return matriz
+
+# ----------------------------------------------------------------------------------
+def imprimir_matriz(matriz):
+    for linha in matriz:
+        for elemento in linha:
+            print(elemento, end=' ')
+        print()
 # ----------------------------------------------------------------------------------
 # CSI457 e CSI701
 # Programa Principal
 # Data: 06/05/2023
 # ----------------------------------------------------------------------------------
 board = create_board()
+weights_board = create_weights_board()
 game_over = False
 turn = 0
 
