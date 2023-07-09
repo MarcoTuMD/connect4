@@ -4,6 +4,7 @@ from os import system, name
 ROWS = 6
 COLUMNS = 7
 
+
 # ----------------------------------------------------------------------------------
 def clear():
     # para windows
@@ -56,6 +57,7 @@ def is_winning_move(board, piece):
 
 # ----------------------------------------------------------------------------------
 def minimax(board, depth, maximizing_player):
+    global explored_states
     if is_winning_move(board, 2):  # IA ganhou
         return (None, 100)
     elif is_winning_move(board, 1):  # jogador humano ganhou
@@ -72,6 +74,7 @@ def minimax(board, depth, maximizing_player):
         for col in valid_locations:
             temp_board = board.copy()
             drop_piece(temp_board, col, 2)
+            explored_states += 1
             new_score = minimax(temp_board, depth - 1, False)[1]
             if new_score > value:
                 value = new_score
@@ -84,11 +87,58 @@ def minimax(board, depth, maximizing_player):
         for col in valid_locations:
             temp_board = board.copy()
             drop_piece(temp_board, col, 1)
+            explored_states += 1
             new_score = minimax(temp_board, depth - 1, True)[1]
             if new_score < value:
                 value = new_score
                 column = col
+        return column, value, explored_states
+
+# ----------------------------------------------------------------------------------
+def minimax_pruning(board, depth, alpha, beta, maximizing_player):
+    global explored_states
+    if is_winning_move(board, 2):  # IA ganhou
+        return (None, 100)
+    elif is_winning_move(board, 1):  # jogador humano ganhou
+        return (None, -100)
+    elif len(get_valid_locations(board)) == 0:  # jogo empatado
+        return (None, 0)
+    elif depth == 0:  # profundidade máxima atingida
+        return (None, 0)
+
+    valid_locations = get_valid_locations(board)
+    if maximizing_player:
+        value = -np.Inf
+        column = np.random.choice(valid_locations)
+        for col in valid_locations:
+            temp_board = board.copy()
+            drop_piece(temp_board, col, 2)
+            explored_states += 1
+            new_score = minimax_pruning(temp_board, depth - 1, alpha, beta, False)[1]
+            if new_score > value:
+                value = new_score
+                column = col
+            alpha = max(alpha, value)
+            if alpha >= beta:
+                break
         return column, value
+
+    else:  # minimizing player
+        value = np.Inf
+        column = np.random.choice(valid_locations)
+        for col in valid_locations:
+            temp_board = board.copy()
+            drop_piece(temp_board, col, 1)
+            explored_states += 1
+            new_score = minimax_pruning(temp_board, depth - 1, alpha, beta, True)[1]
+            if new_score < value:
+                value = new_score
+                column = col
+            beta = min(beta, value)
+            if alpha >= beta:
+                break
+        return column, value
+
 
 # ----------------------------------------------------------------------------------
 def get_valid_locations(board):
@@ -190,12 +240,20 @@ board = create_board()
 weights_board = create_weights_board()
 game_over = False
 turn = 0
+explored_states = 0
 
 clear()
+opc = input("Deseja realizar poda? [S/N]")
+while opc != "S" and opc != "N": 
+    opc = input("Deseja realizar poda? [S/N]")
+
 while not game_over:
+    explored_states = 0
     # Movimento do Jogador 1
     if turn == 0:
         col = int(input("Jogador 1, selecione a coluna ({}-0):".format(COLUMNS-1)))
+        while col < 0 or col > COLUMNS -1: 
+            col = int(input("Jogador 1, selecione a coluna ({}-0):".format(COLUMNS-1)))
         if valid_location(board, col):
             drop_piece(board, col, 1)
             if is_winning_move(board, 1):
@@ -204,7 +262,10 @@ while not game_over:
 
     # Movimento da IA
     else:
-        col, minimax_score = minimax(board, 4, True)
+        if opc == "N":
+            col, minimax_score= minimax(board, 4, True)
+        else:
+            col, minimax_score= minimax_pruning(board, 4,-1000000000, 1000000000, True)
         if valid_location(board, col):
             drop_piece(board, col, 2)
             if is_winning_move(board, 2):
@@ -214,6 +275,7 @@ while not game_over:
     imprimir_matriz(board)
     print(" ")
     print("Heuristica: ", heuristic_calculation(board))
+    print("Estados explorados:  ", explored_states)
     print(" ")
     turn += 1
     turn = turn % 2
