@@ -1,5 +1,6 @@
 import numpy as np
 from os import system, name
+import time
 
 ROWS = 6
 COLUMNS = 7
@@ -248,6 +249,7 @@ while opc != "S" and opc != "N":
     opc = input("Deseja realizar poda? [S/N]")
 
 while not game_over:
+    start = time.time()
     explored_states = 0
     # Movimento do Jogador 1
     if turn == 0:
@@ -271,11 +273,14 @@ while not game_over:
             if is_winning_move(board, 2):
                 print("Jogador 2 Vence!!!")
                 game_over = True
+    
+    end = time.time()
 
     imprimir_matriz(board)
     print(" ")
     print("Heuristica: ", heuristic_calculation(board))
     print("Estados explorados:  ", explored_states)
+    print("Tempo de execucao:  ", round(end-start, 3))
     print(" ")
     turn += 1
     turn = turn % 2
