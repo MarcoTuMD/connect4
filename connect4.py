@@ -66,7 +66,7 @@ def minimax(board, depth, maximizing_player):
     elif len(get_valid_locations(board)) == 0:  # jogo empatado
         return (None, 0)
     elif depth == 0:  # profundidade máxima atingida
-        return (None, 0)
+        return (None, heuristic_calculation(board))
 
     valid_locations = get_valid_locations(board)
     if maximizing_player:
@@ -93,7 +93,7 @@ def minimax(board, depth, maximizing_player):
             if new_score < value:
                 value = new_score
                 column = col
-        return column, value, explored_states
+        return column, value
 
 # ----------------------------------------------------------------------------------
 def minimax_pruning(board, depth, alpha, beta, maximizing_player):
@@ -105,7 +105,7 @@ def minimax_pruning(board, depth, alpha, beta, maximizing_player):
     elif len(get_valid_locations(board)) == 0:  # jogo empatado
         return (None, 0)
     elif depth == 0:  # profundidade máxima atingida
-        return (None, 0)
+        return (None, heuristic_calculation(board))
 
     valid_locations = get_valid_locations(board)
     if maximizing_player:
@@ -119,26 +119,27 @@ def minimax_pruning(board, depth, alpha, beta, maximizing_player):
             if new_score > value:
                 value = new_score
                 column = col
-            alpha = max(alpha, value)
+            alpha = max(alpha,value)
             if alpha >= beta:
                 break
-        return column, value
+        return column,value
 
-    else:  # minimizing player
-        value = np.Inf
-        column = np.random.choice(valid_locations)
-        for col in valid_locations:
-            temp_board = board.copy()
-            drop_piece(temp_board, col, 1)
-            explored_states += 1
-            new_score = minimax_pruning(temp_board, depth - 1, alpha, beta, True)[1]
-            if new_score < value:
-                value = new_score
-                column = col
-            beta = min(beta, value)
-            if alpha >= beta:
-                break
-        return column, value
+    else: # minimizing player 
+        value = np.Inf 
+        column = np.random.choice(valid_locations) 
+        for col in valid_locations: 
+            temp_board = board.copy() 
+            drop_piece(temp_board,col ,1) 
+            explored_states +=1 
+            new_score=minimax_pruning(temp_board ,depth-1,alpha,beta,True)[1] 
+            if new_score < value: 
+                value=new_score 
+                column=col 
+            beta=min(beta,value) 
+            if alpha >= beta: 
+                break 
+        return column,value 
+
 
 
 # ----------------------------------------------------------------------------------
