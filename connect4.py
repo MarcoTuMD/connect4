@@ -20,6 +20,18 @@ def clear():
 def create_board():
     board = np.zeros((ROWS, COLUMNS))
     return board
+    
+# ----------------------------------------------------------------------------------
+def create_weights_board():
+    # cria a tabela de pesos
+    matriz = [[0] * COLUMNS for _ in range(ROWS)]
+    
+    for i in range(ROWS):
+        for j in range(COLUMNS):
+            valor = min(i, j, ROWS - i - 1, COLUMNS - j - 1) + 1
+            matriz[i][j] = valor
+    
+    return matriz
 
 # ----------------------------------------------------------------------------------
 def valid_location(board, column):
@@ -115,8 +127,7 @@ def minimax_pruning(board, depth, alpha, beta, maximizing_player):
             temp_board = board.copy()
             drop_piece(temp_board, col, 2)
             explored_states += 1
-            new_score = minimax_pruning(temp_board, depth - 1, alpha, beta, False)[1]
-            new_score+= heuristic_calculation(temp_board, 1)
+            new_score = minimax_pruning(temp_board, depth - 1, alpha, beta, False)[1] + heuristic_calculation(temp_board, 1) 
             if new_score > value:
                 value = new_score
                 column = col
@@ -132,8 +143,7 @@ def minimax_pruning(board, depth, alpha, beta, maximizing_player):
             temp_board = board.copy() 
             drop_piece(temp_board,col ,1) 
             explored_states +=1 
-            new_score=minimax_pruning(temp_board ,depth-1,alpha,beta,True)[1] 
-            new_score+= heuristic_calculation(temp_board, 2)
+            new_score=minimax_pruning(temp_board ,depth-1,alpha,beta,True)[1] + heuristic_calculation(temp_board, 2)
             if new_score < value: 
                 value=new_score 
                 column=col 
@@ -155,6 +165,7 @@ def get_valid_locations(board):
 
 # ----------------------------------------------------------------------------------
 def count_two_piece(board, piece):
+    # recupera a quantidade de pares no jogo
     count = 0
     for c in range(COLUMNS - 3):
         for r in range(ROWS):
@@ -177,6 +188,7 @@ def count_two_piece(board, piece):
 
 # ----------------------------------------------------------------------------------
 def count_three_piece(board, piece):
+    # recupera a aquantidade de trios no jogo
     count = 0
     for c in range(COLUMNS - 3):
         for r in range(ROWS):
@@ -197,6 +209,7 @@ def count_three_piece(board, piece):
     return count
 
 def count_four_piece(board, piece):
+    # recupera a quantidade de quartetos no jogo
     count = 0
     for c in range(COLUMNS - 3):
         for r in range(ROWS):
@@ -222,6 +235,7 @@ def count_four_piece(board, piece):
 
 # ----------------------------------------------------------------------------------
 def count_weight(board, piece):
+    # retorna a soma dos pesos
     count = 0
     for c in range(COLUMNS):
         for r in range(ROWS):
@@ -231,24 +245,11 @@ def count_weight(board, piece):
 
 # ----------------------------------------------------------------------------------
 def heuristic_calculation(board, player):
-    if player == 1:
-        return (count_weight(board ,1) + count_two_piece(board,1) + 2 * count_three_piece(board,1)) + 100* count_four_piece(board, 1) - (count_weight(board ,2) + count_two_piece(board,2) + 5 * count_three_piece(board,2) +  100* count_four_piece(board, 2))
-    else:
-        return (count_weight(board ,2) + count_two_piece(board,2) + 2 * count_three_piece(board,2)) + 100* count_four_piece(board, 2) - (count_weight(board ,1) + count_two_piece(board,1) + 5 * count_three_piece(board,1) + 100* count_four_piece(board, 1))
-# ----------------------------------------------------------------------------------
-def create_weights_board():
-    matriz = [[0] * COLUMNS for _ in range(ROWS)]
-    
-    for i in range(ROWS):
-        for j in range(COLUMNS):
-            valor = min(i, j, ROWS - i - 1, COLUMNS - j - 1) + 1
-            matriz[i][j] = valor
-    
-    return matriz
+    return (count_weight(board ,player) + count_two_piece(board,player) + 2 * count_three_piece(board,player)) + 100* count_four_piece(board, player) - (count_weight(board ,3-player) + count_two_piece(board,3-player) + 2 * count_three_piece(board,3-player) +  100* count_four_piece(board, 3-player))
 
 # ----------------------------------------------------------------------------------
-def imprimir_matriz(matriz):
-    mat90= np.rot90(matriz, k = 1, axes = (0, 1))
+def print_matrix(matrix):
+    mat90= np.rot90(matrix, k = 1, axes = (0, 1))
     mat180= np.rot90(mat90, k = 1, axes = (0, 1))
 
     for l in mat180:
@@ -305,7 +306,7 @@ while not game_over:
     
     end = time.time()
 
-    imprimir_matriz(board)
+    print_matrix(board)
     print(" ")
     print("Estados explorados:  ", explored_states)
     print("Tempo de execucao:  ", round(end-start, 3))
