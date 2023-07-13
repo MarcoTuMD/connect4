@@ -66,7 +66,7 @@ def minimax(board, depth, maximizing_player):
     elif len(get_valid_locations(board)) == 0:  # jogo empatado
         return (None, 0)
     elif depth == 0:  # profundidade máxima atingida
-        return (None, heuristic_calculation(board))
+        return (None, 0)
 
     valid_locations = get_valid_locations(board)
     if maximizing_player:
@@ -76,7 +76,7 @@ def minimax(board, depth, maximizing_player):
             temp_board = board.copy()
             drop_piece(temp_board, col, 2)
             explored_states += 1
-            new_score = minimax(temp_board, depth - 1, False)[1]
+            new_score = minimax(temp_board, depth - 1, False)[1] + heuristic_calculation(temp_board, 1)
             if new_score > value:
                 value = new_score
                 column = col
@@ -89,7 +89,7 @@ def minimax(board, depth, maximizing_player):
             temp_board = board.copy()
             drop_piece(temp_board, col, 1)
             explored_states += 1
-            new_score = minimax(temp_board, depth - 1, True)[1]
+            new_score = minimax(temp_board, depth - 1, True)[1] + heuristic_calculation(temp_board, 2)
             if new_score < value:
                 value = new_score
                 column = col
@@ -105,7 +105,7 @@ def minimax_pruning(board, depth, alpha, beta, maximizing_player):
     elif len(get_valid_locations(board)) == 0:  # jogo empatado
         return (None, 0)
     elif depth == 0:  # profundidade máxima atingida
-        return (None, heuristic_calculation(board))
+        return (None, 0)
 
     valid_locations = get_valid_locations(board)
     if maximizing_player:
@@ -116,6 +116,7 @@ def minimax_pruning(board, depth, alpha, beta, maximizing_player):
             drop_piece(temp_board, col, 2)
             explored_states += 1
             new_score = minimax_pruning(temp_board, depth - 1, alpha, beta, False)[1]
+            new_score+= heuristic_calculation(temp_board, 1)
             if new_score > value:
                 value = new_score
                 column = col
@@ -132,6 +133,7 @@ def minimax_pruning(board, depth, alpha, beta, maximizing_player):
             drop_piece(temp_board,col ,1) 
             explored_states +=1 
             new_score=minimax_pruning(temp_board ,depth-1,alpha,beta,True)[1] 
+            new_score+= heuristic_calculation(temp_board, 2)
             if new_score < value: 
                 value=new_score 
                 column=col 
@@ -194,6 +196,30 @@ def count_three_piece(board, piece):
                 count +=1
     return count
 
+def count_four_piece(board, piece):
+    count = 0
+    for c in range(COLUMNS - 3):
+        for r in range(ROWS):
+            if board[r][c] == piece and board[r][c + 1] == piece and board[r][c + 2] == piece and board[r][
+                c + 3] == piece:
+                count +=1
+    for c in range(COLUMNS):
+        for r in range(ROWS - 3):
+            if board[r][c] == piece and board[r + 1][c] == piece and board[r + 2][c] == piece and board[r + 3][
+                c] == piece:
+                count +=1
+    for c in range(COLUMNS - 3):
+        for r in range(ROWS - 3):
+            if board[r][c] == piece and board[r + 1][c + 1] == piece and board[r + 2][c + 2] == piece and board[r + 3][
+                c + 3] == piece:
+                count +=1
+    for c in range(COLUMNS - 3):
+        for r in range(3, ROWS):
+            if board[r][c] == piece and board[r - 1][c + 1] == piece and board[r - 2][c + 2] == piece and board[r - 3][
+                c + 3] == piece:
+                count +=1
+    return count
+
 # ----------------------------------------------------------------------------------
 def count_weight(board, piece):
     count = 0
@@ -204,9 +230,11 @@ def count_weight(board, piece):
     return count
 
 # ----------------------------------------------------------------------------------
-def heuristic_calculation(board):
-    return (count_weight(board ,1) + count_two_piece(board,1) + 2 * count_three_piece(board,1) ) - ( count_weight(board, 2) + count_two_piece(board,2) + 2 * count_three_piece(board,2))
-
+def heuristic_calculation(board, player):
+    if player == 1:
+        return (count_weight(board ,1) + count_two_piece(board,1) + 2 * count_three_piece(board,1)) + 100* count_four_piece(board, 1) - (count_weight(board ,2) + count_two_piece(board,2) + 5 * count_three_piece(board,2) +  100* count_four_piece(board, 2))
+    else:
+        return (count_weight(board ,2) + count_two_piece(board,2) + 2 * count_three_piece(board,2)) + 100* count_four_piece(board, 2) - (count_weight(board ,1) + count_two_piece(board,1) + 5 * count_three_piece(board,1) + 100* count_four_piece(board, 1))
 # ----------------------------------------------------------------------------------
 def create_weights_board():
     matriz = [[0] * COLUMNS for _ in range(ROWS)]
@@ -279,7 +307,6 @@ while not game_over:
 
     imprimir_matriz(board)
     print(" ")
-    print("Heuristica: ", heuristic_calculation(board))
     print("Estados explorados:  ", explored_states)
     print("Tempo de execucao:  ", round(end-start, 3))
     print(" ")
